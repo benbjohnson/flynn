@@ -806,12 +806,16 @@ func (r *Raft) leaderLoop() {
 	for r.getState() == Leader {
 		select {
 		case rpc := <-r.rpcCh:
+			r.logger.Printf("leader loop: processing rpc")
 			r.processRPC(rpc)
 
 		case <-r.leaderState.stepDown:
+			r.logger.Printf("leader loop: stepping down")
 			r.setState(Follower)
 
 		case <-r.leaderState.commitCh:
+			r.logger.Printf("leader loop: committing")
+
 			// Get the committed messages
 			committed := r.leaderState.inflight.Committed()
 			for e := committed.Front(); e != nil; e = e.Next() {
@@ -826,6 +830,8 @@ func (r *Raft) leaderLoop() {
 			}
 
 		case v := <-r.verifyCh:
+			r.logger.Printf("leader loop: verifying leadership")
+
 			if v.quorumSize == 0 {
 				// Just dispatched, start the verification
 				r.verifyLeader(v)
@@ -844,9 +850,12 @@ func (r *Raft) leaderLoop() {
 			}
 
 		case p := <-r.peerCh:
+			r.logger.Printf("leader loop: setting peers")
 			p.respond(ErrLeader)
 
 		case newLog := <-r.applyCh:
+			r.logger.Printf("leader loop: applying: begin")
+
 			// Group commit, gather all the ready commits
 			ready := []*logFuture{newLog}
 			for i := 0; i < r.conf.MaxAppendEntries; i++ {
@@ -857,6 +866,8 @@ func (r *Raft) leaderLoop() {
 					break
 				}
 			}
+
+			r.logger.Printf("leader loop: applying: ready=%d", len(ready))
 
 			// Handle any peer set changes
 			n := len(ready)
@@ -879,6 +890,8 @@ func (r *Raft) leaderLoop() {
 				r.processLog(&log.log, nil, true)
 			}
 
+			r.logger.Printf("leader loop: applying: logs processed")
+
 			// Nothing to do if all logs are invalid
 			if n == 0 {
 				continue
@@ -887,8 +900,11 @@ func (r *Raft) leaderLoop() {
 			// Dispatch the logs
 			ready = ready[:n]
 			r.dispatchLogs(ready)
+			r.logger.Printf("leader loop: applying: logs dispatched")
 
 		case <-lease:
+			r.logger.Printf("leader loop: leader lease")
+
 			// Check if we've exceeded the lease, potentially stepping down
 			maxDiff := r.checkLeaderLease()
 
@@ -903,6 +919,7 @@ func (r *Raft) leaderLoop() {
 			lease = time.After(checkInterval)
 
 		case <-r.shutdownCh:
+			r.logger.Printf("leader loop: shutting down")
 			return
 		}
 	}
