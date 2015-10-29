@@ -810,8 +810,14 @@ func (s *Store) raftApply(typ byte, cmd []byte) (uint64, error) {
 	// Join the command type and data into one message.
 	buf := append([]byte{typ}, cmd...)
 
+	// Benchmark time to reach consensus.
+	startTime := time.Now()
+
 	// Apply to raft and receive an ApplyFuture back.
 	f := s.raft.Apply(buf, 30*time.Second)
+
+	s.logger.Printf("apply: commit=%s", time.Since(startTime))
+
 	if err := f.Error(); err == raft.ErrNotLeader {
 		return 0, ErrNotLeader // hide underlying implementation error
 	} else if err != nil {
@@ -824,8 +830,14 @@ func (s *Store) raftApply(typ byte, cmd []byte) (uint64, error) {
 }
 
 func (s *Store) Apply(l *raft.Log) interface{} {
+	// Benchmark time to actually apply
+	startTime := time.Now()
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
+	lockTime := time.Now()
+	defer func() { s.logger.Printf("apply: lock=%s, exec=%s", lockTime.Sub(startTime), time.Since(lockTime)) }()
 
 	// Require at least a "command type" header byte.
 	if len(l.Data) == 0 {
