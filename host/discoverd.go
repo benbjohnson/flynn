@@ -96,7 +96,7 @@ func (d *DiscoverdManager) ConnectPeer(ips []string) error {
 	var err error
 	for _, ip := range ips {
 		// TODO: log attempt
-		url := fmt.Sprintf("http://%s:1111", ip)
+		url := fmt.Sprintf("http://%s:1110", ip)
 		if err = d.heartbeat(url); err != nil {
 			// TODO: log error
 			continue

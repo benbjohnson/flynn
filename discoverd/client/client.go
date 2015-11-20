@@ -35,7 +35,7 @@ type Client struct {
 func NewClient() *Client {
 	url := os.Getenv("DISCOVERD")
 	if url == "" {
-		url = "http://127.0.0.1:1111"
+		url = "http://127.0.0.1:1110"
 	}
 	return NewClientWithURL(url)
 }
@@ -57,7 +57,7 @@ func NewClientWithURL(url string) *Client {
 
 func NewClientWithHTTP(url string, hc *http.Client) *Client {
 	if url == "" {
-		url = "http://127.0.0.1:1111"
+		url = "http://127.0.0.1:1110"
 	}
 	return &Client{
 		c: &httpclient.Client{

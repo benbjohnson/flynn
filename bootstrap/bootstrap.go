@@ -66,7 +66,7 @@ func (s *State) DiscoverdClient() (*discoverd.Client, error) {
 		if err != nil {
 			return nil, err
 		}
-		s.discoverd = discoverd.NewClientWithURL(fmt.Sprintf("http://%s:1111", host))
+		s.discoverd = discoverd.NewClientWithURL(fmt.Sprintf("http://%s:1110", host))
 	}
 	return s.discoverd, nil
 }

@@ -78,7 +78,7 @@ func (h *Helper) discoverdClient(t *c.C) *discoverd.Client {
 	h.discMtx.Lock()
 	defer h.discMtx.Unlock()
 	if h.disc == nil {
-		h.disc = discoverd.NewClientWithURL(fmt.Sprintf("http://%s:1111", routerIP))
+		h.disc = discoverd.NewClientWithURL(fmt.Sprintf("http://%s:1110", routerIP))
 	}
 	return h.disc
 }

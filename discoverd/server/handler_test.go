@@ -104,10 +104,10 @@ func TestHandler_PutService_ErrNotLeader(t *testing.T) {
 	h.Store.AddServiceFn = func(service string, config *discoverd.ServiceConfig) error { return server.ErrNotLeader }
 
 	w := httptest.NewRecorder()
-	h.ServeHTTP(w, MustNewHTTPRequest("PUT", "http://host0:1111/services/abc", strings.NewReader(`{"leader_type":"manual"}`)))
+	h.ServeHTTP(w, MustNewHTTPRequest("PUT", "http://host0:1110/services/abc", strings.NewReader(`{"leader_type":"manual"}`)))
 	if w.Code != http.StatusTemporaryRedirect {
 		t.Fatalf("unexpected status code: %d", w.Code)
-	} else if loc := w.Header().Get("Location"); loc != `http://host1:1111/services/abc` {
+	} else if loc := w.Header().Get("Location"); loc != `http://host1:1110/services/abc` {
 		t.Fatalf("unexpected Location header: %s", loc)
 	}
 }

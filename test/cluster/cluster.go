@@ -81,7 +81,7 @@ func (c *Cluster) discoverdClient(ip string) *discoverd.Client {
 	c.discMtx.Lock()
 	defer c.discMtx.Unlock()
 	if c.disc == nil {
-		c.disc = discoverd.NewClientWithURL(fmt.Sprintf("http://%s:1111", ip))
+		c.disc = discoverd.NewClientWithURL(fmt.Sprintf("http://%s:1110", ip))
 	}
 	return c.disc
 }
@@ -548,7 +548,7 @@ func (c *Cluster) bootstrapLayer1(instances []*Instance) error {
 	c.ControllerPin = cert.Pin
 
 	// grab the router IP from discoverd
-	disc := discoverd.NewClientWithURL(fmt.Sprintf("http://%s:1111", inst.IP))
+	disc := discoverd.NewClientWithURL(fmt.Sprintf("http://%s:1110", inst.IP))
 	leader, err := disc.Service("router-api").Leader()
 	if err != nil {
 		return fmt.Errorf("could not detect router ip: %s", err)

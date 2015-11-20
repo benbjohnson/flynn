@@ -74,7 +74,7 @@ func (s *ClientSuite) TestWatchReconnect(c *C) {
 	}
 
 	// register three services
-	register(clientA, ":1111", nil)
+	register(clientA, ":1110", nil)
 	hb2, _ := register(clientA, ":2222", map[string]string{"foo": "bar"})
 	hb3, _ := register(clientA, ":3333", nil)
 
