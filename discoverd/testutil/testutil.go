@@ -74,11 +74,11 @@ func RunDiscoverdServer(t TestingT, port string) (string, func()) {
 	}()
 
 	// Ping server and wait for leadership.
-	if err := waitForLeader(t, "127.0.0.1:"+httpPort, 5*time.Second); err != nil {
+	if err := waitForLeader(t, "127.0.0.1:"+port, 5*time.Second); err != nil {
 		t.Fatal("waiting for leader: ", err)
 	}
 
-	return "127.0.0.1:" + httpPort, func() {
+	return "127.0.0.1:" + port, func() {
 		close(killCh)
 		os.RemoveAll(dataDir)
 		<-doneCh
@@ -96,7 +96,7 @@ func BootDiscoverd(t TestingT, port string) (*discoverd.Client, func()) {
 }
 
 func SetupDiscoverd(t TestingT) (*discoverd.Client, func()) {
-	client, killDiscoverd := BootDiscoverd(t, "", "")
+	client, killDiscoverd := BootDiscoverd(t, "")
 	return client, func() {
 		killDiscoverd()
 	}
